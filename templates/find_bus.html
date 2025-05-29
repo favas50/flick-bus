@@ -1,63 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Bus - Flick Bus</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Flick Bus - Find Bus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            /* Using Montserrat font */
+            background-color: #1a1a1a;
+            /* Dark background */
+            color: #ffffff;
+            /* White text color */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            /* Full viewport height */
+            margin: 0;
+            /* Remove default body margin */
+            overflow-x: hidden;
+            /* Prevent horizontal scroll */
+        }
+
+        /* Optional: Add a subtle background gradient or pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(30, 58, 138, 0.2), transparent 50%),
+                radial-gradient(circle at bottom right, rgba(4, 116, 144, 0.2), transparent 50%)
+        }
+
+        .site-header {
+            background-color: #2a2a2a;
+            /* Darker header background */
+            padding: 1rem 0;
+        }
+
+        .site-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .site-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            /* Slightly smaller header font */
+        }
+
+        .site-nav a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .site-nav a:hover {
+            color: #cccccc;
+        }
+
+        .main-content {
+            flex: 1;
+            /* Take remaining vertical space */
+            padding: 2rem;
+            /* Add some padding */
+        }
+
+        .site-footer {
+            background-color: #2a2a2a;
+            /* Darker footer background */
+            color: #cccccc;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: auto;
+            /* Push footer to bottom */
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            /* More padding for hero */
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            /* Larger hero title */
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            /* Slightly larger hero text */
+            color: #cccccc;
+        }
+
+        /* Styles for the "Find Bus" page */
+        .find-bus-form {
+            background-color: #2a2a2a;
+            /* Dark form background */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .find-bus-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+        }
+
+        .find-bus-form input,
+        .find-bus-form select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #4a5568;
+            border-radius: 0.375rem;
+            background-color: #4a5568;
+            /* Darker input background */
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .find-bus-form button {
+            background-color: #4c51bf;
+            /* Indigo button color */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .find-bus-form button:hover {
+            background-color: #5661b3;
+            /* Lighter indigo on hover */
+        }
+
+        #resultsArea {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #2a2a2a;
+            /* Darker results background */
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #resultsArea h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        #resultsArea p {
+            color: #cccccc;
+        }
+
+        .bus-timing-card {
+            background-color: #4a5568;
+            /* Darker card background */
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .bus-timing-card p {
+            margin: 0.5rem 0;
+        }
+
+        .bus-timing-card strong {
+            color: #ffffff;
+        }
+
+        .status-message {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+        }
+
+        .status-success {
+            background-color: #48bb78;
+            /* Green success background */
+            color: #ffffff;
+        }
+
+        .status-error {
+            background-color: #e53e3e;
+            /* Red error background */
+            color: #ffffff;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .site-header .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .site-nav {
+                margin-top: 1rem;
+            }
+
+            .site-nav a {
+                display: block;
+                padding: 0.5rem 0;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-500 p-4 text-white">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-xl font-semibold">Flick Bus</a>
-            <div>
-                <a href="/" class="px-3 hover:text-gray-200">Home</a>
-                <a href="/about" class="px-3 hover:text-gray-200">About</a>
-                <a href="/next_bus" class="px-3 hover:text-gray-200">Next Bus</a>
-                <a href="/find_bus" class="px-3 hover:text-gray-200">Find Bus</a>
-                <a href="/explore" class="px-3 hover:text-gray-200">Explore</a>
-                <a href="/admin" class="px-3 hover:text-gray-200">Admin</a>
+
+<body>
+    <header class="site-header">
+        <div class="container mx-auto">
+            <h1>Flick Bus</h1>
+            <nav class="site-nav">
+                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('about') }}">About</a>
+                <a href="{{ url_for('next_bus') }}">Next Bus</a>
+                <a href="{{ url_for('find_bus') }}">Find Bus</a>
+                <a href="{{ url_for('explore') }}">Explore</a>
+                <a href="{{ url_for('admin') }}">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="find-bus-section">
+            <h2 class="text-2xl font-semibold mb-4">Find Bus Timings</h2>
+
+            <form id="findBusForm" class="find-bus-form">
+                <div class="mb-4">
+                    <label for="from" class="block text-sm font-bold mb-2">From:</label>
+                    <select id="from" name="from" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="" disabled selected>Select starting station</option>
+                        <option value="Edappal">Edappal</option>
+                        <option value="Kuttippuram">Kuttippuram</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="to" class="block text-sm font-bold mb-2">To:</label>
+                    <select id="to" name="to" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="" disabled selected>Select destination station</option>
+                        <option value="Edappal">Edappal</option>
+                        <option value="Kuttippuram">Kuttippuram</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="route" class="block text-sm font-bold mb-2">Route:</label>
+                    <input type="text" id="route" name="route" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Edappal-Kuttippuram">
+                </div>
+
+                <div class="mb-4">
+                    <label for="date" class="block text-sm font-bold mb-2">Date (YYYY-MM-DD):</label>
+                    <input type="date" id="date" name="date" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <div class="mb-4">
+                    <label for="time" class="block text-sm font-bold mb-2">Time (HH:MM):</label>
+                    <input type="time" id="time" name="time" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <button id="findBusesButton" type="button" onclick="fetchBusTimings()" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Find Buses
+                </button>
+            </form>
+
+            <div id="resultsArea" class="mt-6">
+                <h2 class="text-xl font-semibold mb-4">Bus Timings:</h2>
+                <p id="noResultsMessage" class="italic">Enter search criteria to find bus timings.</p>
             </div>
-        </div>
-    </nav>
+        </section>
+    </main>
 
-    <div class="container mx-auto p-8">
-        <h1 class="text-2xl font-semibold mb-6 text-gray-800">Find Bus Timings</h1>
-
-        <div class="mb-4">
-            <label for="from" class="block text-gray-700 text-sm font-bold mb-2">From:</label>
-            <input type="text" id="from" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label for="to" class="block text-gray-700 text-sm font-bold mb-2">To:</label>
-            <input type="text" id="to" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label for="route" class="block text-gray-700 text-sm font-bold mb-2">Route:</label>
-            <input type="text" id="route" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label for="date" class="block text-gray-700 text-sm font-bold mb-2">Date (YYYY-MM-DD):</label>
-            <input type="date" id="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label for="time" class="block text-gray-700 text-sm font-bold mb-2">Time (HH:MM):</label>
-            <input type="time" id="time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <button onclick="fetchBusTimings()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Find Buses
-        </button>
-
-        <div id="resultsArea" class="mt-6 text-gray-800">
-            <p id="noResultsMessage" class="text-gray-500 italic">Enter search criteria to find bus timings.</p>
-        </div>
-    </div>
+    <footer class="site-footer">
+        &copy; 2025 Flick Bus. All rights reserved.
+    </footer>
 
     <script>
         async function fetchBusTimings() {
@@ -87,29 +331,38 @@
                             </div>
                         `;
                     });
-                     // Hide the initial "no results" message if buses are found
-                     if (noResultsMessage) {
-                         noResultsMessage.style.display = 'none';
-                     }
+                    // Hide the initial "no results" message if buses are found
+                    if (noResultsMessage) {
+                        noResultsMessage.style.display = 'none';
+                    }
                 } else {
                     resultsArea.innerHTML += '<p id="noResultsMessage" class="text-cccccc italic">No bus timings found for this route segment on the selected date and time.</p>';
-                     // Show the initial "no results" message if no buses are found
-                     if (noResultsMessage) {
-                         noResultsMessage.style.display = 'block';
-                     }
+                    // Show the initial "no results" message if no buses are found
+                    if (noResultsMessage) {
+                        noResultsMessage.style.display = 'block';
+                    }
                 }
 
             } catch (error) {
                 // Handle network errors (e.g., backend server is not running)
                 console.error('Error fetching bus data:', error);
-                 resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Bus Timings:</h2>';
+                resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Bus Timings:</h2>';
                 resultsArea.innerHTML += '<p class="text-red-500 italic">Could not connect to the bus data server. Please ensure the backend is running.</p>';
-                 if (noResultsMessage) {
-                     noResultsMessage.style.display = 'block';
-                 }
+                if (noResultsMessage) {
+                    noResultsMessage.style.display = 'block';
+                }
             }
             // --- End Call the Backend API ---
         }
+
+        // Initial state: show the no results message
+        if (noResultsMessage) {
+            noResultsMessage.style.display = 'block';
+        }
+
+        // Initial call to update button state on page load (in case dropdowns have default values)
+        updateSearchButtonState();
     </script>
 </body>
+
 </html>
