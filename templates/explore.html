@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flick Bus - Explore Destinations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif; /* Using Montserrat font */
+            background-color: #1a1a1a; /* Dark background */
+            color: #ffffff; /* White text color */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0; /* Remove default body margin */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Optional: Add a subtle background gradient or pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(30, 58, 138, 0.2), transparent 50%),
+                        radial-gradient(circle at bottom right, rgba(4, 116, 144, 0.2), transparent 50%); /* Subtle blue/teal gradients */
+            z-index: -1;
+        }
+
+        /* Header/Navigation Styling - Transparent */
+        .site-header {
+            background-color: transparent; /* Make background transparent */
+            padding: 1.5rem 0; /* More padding */
+            position: absolute; /* Position over the content */
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 20; /* Ensure it's above other content */
+            /* Removed box-shadow for a cleaner look */
+        }
+
+        .site-header .container {
+             display: flex;
+             justify-content: space-between; /* Space out logo and nav */
+             align-items: center; /* Vertically align */
+             max-width: 1200px; /* Wider container */
+             margin: 0 auto; /* Center the container */
+             padding: 0 2.5rem; /* More padding on sides */
+        }
+
+        .site-title a {
+            color: #ffffff; /* White color for title link */
+            text-decoration: none;
+            font-size: 2rem; /* Larger font size for title */
+            font-weight: 700; /* Bolder weight */
+            transition: opacity 0.3s ease-in-out;
+        }
+         .site-title a:hover {
+             opacity: 0.8; /* Subtle hover effect */
+         }
+
+        .site-nav a {
+            color: #cccccc; /* Light gray for nav links */
+            margin-left: 3rem; /* More spacing between nav links */
+            text-decoration: none;
+            font-weight: 400; /* Regular weight */
+            font-size: 1.05rem; /* Slightly larger font */
+            transition: color 0.2s ease-in-out;
+        }
+        .site-nav a:hover {
+            color: #ffffff; /* White on hover */
+        }
+
+        /* Main Content Section */
+        .main-content {
+            flex-grow: 1; /* Allow main content to grow */
+            width: 100%;
+            max-width: 1000px; /* Match header width */
+            margin: 8rem auto 2rem; /* Add top margin to clear header, center, add bottom margin */
+            padding: 0 2rem; /* Add padding */
+            position: relative; /* Needed for z-index */
+            z-index: 10; /* Ensure content is above background effects */
+        }
+
+        /* Section Styling - Removed background box */
+        .main-content section {
+            /* background-color: #2a2a2a; */ /* Removed */
+            padding: 0; /* Removed padding from the section itself */
+            /* border-radius: 0.75rem; */ /* Removed */
+            /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */ /* Removed */
+        }
+         .main-content section h1,
+         .main-content section h2 {
+             font-size: 2.5rem; /* Larger section titles */
+             font-weight: 700;
+             color: #ffffff; /* White titles */
+             margin-bottom: 1.5rem;
+             text-align: center; /* Center titles */
+         }
+         .main-content section p {
+             font-size: 1.125rem; /* Slightly larger body text */
+             color: #cccccc; /* Light gray text */
+             margin-bottom: 1rem;
+         }
+          .main-content section ul {
+              margin-top: 1rem;
+              list-style: disc;
+              list-style-position: inside;
+              color: #cccccc;
+          }
+           .main-content section ul li {
+               margin-bottom: 0.5rem;
+           }
+
+
+          .destination-item {
+              margin-bottom: 2.5rem; /* More space between destination items */
+              padding-bottom: 2.5rem;
+              border-bottom: 1px solid #3a3a3a; /* Darker separator */
+          }
+          .destination-item:last-child {
+              border-bottom: none;
+              margin-bottom: 0;
+              padding-bottom: 0;
+          }
+          .destination-item h2 {
+              text-align: left; /* Left align titles within destination items */
+              font-size: 2rem; /* Slightly smaller title within item */
+              font-weight: 600; /* Added font-weight */
+              color: #ffffff; /* White title */
+              margin-bottom: 1rem;
+          }
+          .destination-image {
+              max-width: 100%;
+              height: auto;
+              border-radius: 0.5rem; /* Rounded corners for images */
+              margin-bottom: 1.5rem; /* More space below image */
+              box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+          }
+
+
+        /* Footer Styling - Very subtle */
+        .site-footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            color: #777; /* Darker gray */
+            font-size: 0.8rem; /* Smaller font size */
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent dark background */
+        }
+    </style>
+</head>
+<body class="p-0">
+
+    <header class="site-header">
+        <div class="container">
+            <div class="site-title">
+                {# Link to the index route #}
+                <a href="{{ url_for('index') }}">Flick Bus</a>
+            </div>
+            <nav class="site-nav">
+                {# Link to the about route #}
+                <a href="{{ url_for('about') }}">About</a>
+                {# Link to the next_bus route #}
+                <a href="{{ url_for('next_bus') }}">Next Bus</a>
+                {# Link to the find_bus route #h}
+                <a href="{{ url_for('find_bus') }}">Find Bus</a>
+                {# Link to the explore route #}
+                <a href="{{ url_for('explore') }}">Explore</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section>
+            <h1>Explore Destinations</h1>
+
+            <p class="text-center mb-6">
+                Discover notable tourist destinations accessible via the bus routes covered by Flick Bus.
+            </p>
+
+            <div class="destination-item">
+                <img src="https://placehold.co/800x500/2a2a2a/cccccc?text=Biyyam+Kayal" alt="Scenic view of Biyyam Kayal backwaters" class="destination-image">
+                <h2>Near Edappal & Kuttippuram</h2>
+                <ul>
+                    <li>Biyyam Kayal (Edappal) - Scenic backwaters</li>
+                    <li>Thunjan Parambu (Tirur, near Kuttippuram) - Memorial for Thunchaththu Ezhuthachan</li>
+                    <li>Bharathappuzha River - Offers scenic views</li>
+                    <li>Various temples and mosques in the vicinity</li>
+                </ul>
+            </div>
+
+            <div class="destination-item">
+                 <img src="https://placehold.co/800x500/2a2a2a/cccccc?text=Ponnani+Beach" alt="View of Ponnani Beach at sunset" class="destination-image">
+                <h2>Near Ponnani</h2>
+                <ul>
+                    <li>Ponnani Beach - Popular spot for sunsets</li>
+                    <li>Ponnani Juma Masjid - Historical mosque</li>
+                    <li>Padinjarekkara Beach (near Ponnani) - Estuary where Bharathappuzha meets the Arabian Sea</li>
+                </ul>
+            </div>
+
+             <div class="destination-item">
+                 <img src="https://placehold.co/800x500/2a2a2a/cccccc?text=Bharathappuzha+River" alt="View of Bharathappuzha River banks near Pattambi" class="destination-image">
+                <h2>Near Pattambi</h2>
+                <ul>
+                    <li>Bharathappuzha River banks</li>
+                    <li>Local cultural centers and temples</li>
+                    <li>Gateway to explore Palakkad district's attractions</li>
+                </ul>
+            </div>
+
+             <div class="destination-item">
+                  <img src="https://placehold.co/800x500/2a2a2a/cccccc?text=Changaramkulam+Area" alt="Illustration representing the Changaramkulam area" class="destination-image">
+                <h2>Near Changaramkulam</h2>
+                <ul>
+                    <li>Markets and local town attractions</li>
+                    <li>Proximity to coastal areas and backwaters</li>
+                    <li>Access to routes towards Thrissur district</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <p class="italic mt-8 text-center text-cccccc">Explore Kerala with Flick Bus!</p>
+    </main>
+
+    <footer class="site-footer">
+        &copy; 2025 Flick Bus. All rights reserved. Proudly serving Kerala bus routes.
+    </footer>
+</body>
+</html>

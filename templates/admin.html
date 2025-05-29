@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flick Bus - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif; /* Using Montserrat font */
+            background-color: #1a1a1a; /* Dark background */
+            color: #ffffff; /* White text color */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0; /* Remove default body margin */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Optional: Add a subtle background gradient or pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(30, 58, 138, 0.2), transparent 50%),
+                        radial-gradient(circle at bottom right, rgba(4, 116, 144, 0.2), transparent 50%); /* Subtle blue/teal gradients */
+            z-index: -1;
+        }
+
+        /* Header/Navigation Styling - Transparent */
+        .site-header {
+            background-color: transparent; /* Make background transparent */
+            padding: 1.5rem 0; /* More padding */
+            position: absolute; /* Position over the content */
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 20; /* Ensure it's above other content */
+        }
+
+        .site-header .container {
+             display: flex;
+             justify-content: space-between; /* Space out logo and nav */
+             align-items: center; /* Vertically align */
+             max-width: 1200px; /* Wider container */
+             margin: 0 auto; /* Center the container */
+             padding: 0 2.5rem; /* More padding on sides */
+        }
+
+        .site-title a {
+            color: #ffffff; /* White color for title link */
+            text-decoration: none;
+            font-size: 2rem; /* Larger font size for title */
+            font-weight: 700; /* Bolder weight */
+            transition: opacity 0.3s ease-in-out;
+        }
+         .site-title a:hover {
+             opacity: 0.8; /* Subtle hover effect */
+         }
+
+        .site-nav a {
+            color: #cccccc; /* Light gray for nav links */
+            margin-left: 3rem; /* More spacing between nav links */
+            text-decoration: none;
+            font-weight: 400; /* Regular weight */
+            font-size: 1.05rem; /* Slightly larger font */
+            transition: color 0.2s ease-in-out;
+        }
+        .site-nav a:hover {
+            color: #ffffff; /* White on hover */
+        }
+
+        /* Main Content Section */
+        .main-content {
+            flex-grow: 1; /* Allow main content to grow */
+            width: 100%;
+            max-width: 1000px; /* Match header width */
+            margin: 8rem auto 2rem; /* Add top margin to clear header, center, add bottom margin */
+            padding: 0 2rem; /* Add padding */
+            position: relative; /* Needed for z-index */
+            z-index: 10; /* Ensure content is above background effects */
+        }
+
+        /* Section Styling */
+        .admin-section {
+            background-color: #2a2a2a; /* Slightly lighter dark background for sections */
+            padding: 2.5rem; /* More padding */
+            border-radius: 0.75rem; /* More rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            margin-bottom: 2rem; /* Space between sections */
+        }
+         .admin-section h1,
+         .admin-section h2 {
+             font-size: 2.5rem; /* Larger section titles */
+             font-weight: 700;
+             color: #ffffff; /* White titles */
+             margin-bottom: 1.5rem;
+             text-align: center; /* Center titles */
+         }
+          .admin-section h2 {
+              font-size: 2rem; /* Slightly smaller for sub-sections */
+          }
+
+
+        /* Form Styling */
+        .admin-form label {
+             display: block;
+             font-size: 0.95rem;
+             font-weight: medium;
+             color: #cccccc; /* Light gray labels */
+             margin-bottom: 0.5rem;
+             margin-top: 1rem;
+        }
+         .admin-form input[type="text"],
+         .admin-form input[type="time"],
+         .admin-form input[type="number"],
+         .admin-form select,
+         .admin-form textarea {
+             width: 100%;
+             padding: 0.75rem 1rem;
+             border: 1px solid #555; /* Darker gray border */
+             border-radius: 0.375rem;
+             font-size: 1rem;
+             color: #ffffff; /* White text */
+             background-color: #3a3a3a; /* Slightly lighter dark background for inputs */
+             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+         }
+          .admin-form input[type="text"]:focus,
+          .admin-form input[type="time"]:focus,
+          .admin-form input[type="number"]:focus,
+          .admin-form select:focus,
+          .admin-form textarea:focus {
+             outline: none;
+             border-color: #0f766e; /* Teal focus color */
+             box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.3); /* Focus ring */
+          }
+         .admin-form textarea {
+             min-height: 100px; /* Make textarea larger */
+             resize: vertical; /* Allow vertical resizing */
+         }
+
+        .admin-form button {
+             display: block;
+             width: 100%;
+             padding: 0.75rem 1.5rem;
+             font-size: 1.125rem;
+             font-weight: 600;
+             border-radius: 0.5rem;
+             background-color: #0f766e; /* Teal button */
+             color: white;
+             margin-top: 2rem;
+             transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        }
+         .admin-form button:hover:not(:disabled) {
+             background-color: #0b5f57; /* Darker teal on hover */
+         }
+         .admin-form button:disabled {
+             opacity: 0.5;
+             cursor: not-allowed;
+         }
+
+        .status-message {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        .status-success {
+            color: #34d399; /* Green */
+        }
+        .status-error {
+            color: #f87171; /* Red */
+        }
+
+        /* Route List Styling */
+        .route-list {
+            list-style: none;
+            padding: 0;
+        }
+        .route-item {
+            background-color: #3a3a3a; /* Slightly lighter dark background */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+        .route-item-info {
+            flex-grow: 1; /* Allow info to take up space */
+            margin-right: 1rem; /* Space between info and buttons */
+        }
+         .route-item-info strong {
+             color: #ffffff; /* White text for route name */
+         }
+         .route-item-info span {
+             color: #cccccc; /* Light gray for stops */
+             font-size: 0.9rem;
+         }
+        .route-item-actions button {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            margin-left: 0.5rem; /* Space between buttons */
+        }
+        .route-item-actions .edit-button {
+            background-color: #facc15; /* Yellow */
+            color: #1a1a1a; /* Dark text */
+        }
+        .route-item-actions .edit-button:hover {
+            background-color: #eab308; /* Darker yellow */
+        }
+        .route-item-actions .remove-button {
+            background-color: #ef4444; /* Red */
+            color: white;
+        }
+        .route-item-actions .remove-button:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+
+        /* Dynamic Schedule Input Styling */
+        .schedule-input-container {
+             margin-top: 1.5rem;
+             padding: 1rem;
+             background-color: #3a3a3a; /* Match input background */
+             border-radius: 0.375rem;
+        }
+        .schedule-input-container h4 {
+             font-size: 1.1rem;
+             font-weight: 600;
+             color: #ffffff;
+             margin-bottom: 1rem;
+             border-bottom: 1px solid #555;
+             padding-bottom: 0.5rem;
+        }
+        .stop-timing-inputs {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid for stop inputs */
+             gap: 1rem; /* Space between stop inputs */
+             margin-bottom: 1rem;
+             padding-bottom: 1rem;
+             border-bottom: 1px dashed #555; /* Dashed separator */
+        }
+        .stop-timing-inputs:last-child {
+             border-bottom: none;
+             margin-bottom: 0;
+             padding-bottom: 0;
+        }
+         .stop-timing-inputs label {
+             display: block;
+             font-size: 0.9rem;
+             font-weight: medium;
+             color: #cccccc;
+             margin-bottom: 0.25rem;
+             margin-top: 0; /* Override default label margin-top */
+         }
+         .stop-timing-inputs input[type="time"] {
+             width: 100%;
+             padding: 0.5rem 0.75rem;
+             border: 1px solid #555;
+             border-radius: 0.25rem;
+             font-size: 0.9rem;
+             color: #ffffff;
+             background-color: #2a2a2a; /* Slightly darker for input */
+         }
+         .stop-timing-inputs input[type="time"]:focus {
+             outline: none;
+             border-color: #0f766e;
+             box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.2);
+         }
+
+
+        /* Footer Styling - Very subtle */
+        .site-footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            color: #777; /* Darker gray */
+            font-size: 0.8rem; /* Smaller font size */
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent dark background */
+        }
+    </style>
+</head>
+<body class="p-0">
+
+    <header class="site-header">
+        <div class="container">
+            <div class="site-title">
+                {# Link to the index route #}
+                <a href="{{ url_for('index') }}">Flick Bus</a>
+            </div>
+            <nav class="site-nav">
+                {# Link to the about route #}
+                <a href="{{ url_for('about') }}">About</a>
+                {# Link to the next_bus route #}
+                <a href="{{ url_for('next_bus') }}">Next Bus</a>
+                {# Link to the find_bus route #h}
+                <a href="{{ url_for('find_bus') }}">Find Bus</a>
+                {# Link to the explore route #}
+                <a href="{{ url_for('explore') }}">Explore</a>
+                {# Link to the admin route #}
+                <a href="{{ url_for('admin') }}">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="admin-section">
+            <h1>Admin Panel</h1>
+            <p class="text-center text-cccccc mb-6">Manage bus routes and timings.</p>
+
+            <div id="addRouteSection" class="mb-8 pb-8 border-b border-gray-700"> {# Add bottom border and padding #}
+                <h2>Add New Route</h2>
+                <form id="addRouteForm" class="admin-form">
+                    <div>
+                        <label for="routeKey">Route Key (e.g., edappal-kuttippuram):</label>
+                        <input type="text" id="routeKey" required>
+                    </div>
+                    <div>
+                        <label for="routeStops">Stops (comma-separated, in order):</label>
+                        <textarea id="routeStops" rows="4" required placeholder="Edappal, annakkampad, kavilpadi, ..."></textarea>
+                    </div>
+                    <div>
+                         <label for="busPrefix">Bus Name Prefix (e.g., Bus AA):</label>
+                         <input type="text" id="busPrefix" required>
+                    </div>
+                    <button type="submit">Add Route</button>
+                </form>
+                <div id="addRouteStatus" class="status-message"></div>
+            </div>
+
+             <div id="manageRoutesSection" class="mb-8 pb-8 border-b border-gray-700">
+                 <h2>Manage Existing Routes</h2>
+                 <ul id="routeList" class="route-list">
+                     {# Existing routes will be loaded here by JavaScript #}
+                 </ul>
+                 <div id="manageRoutesStatus" class="status-message"></div>
+             </div>
+
+
+            <div id="addBusSection">
+                 <h2>Add New Bus Trip</h2>
+                 <form id="addBusForm" class="admin-form">
+                     <div>
+                         <label for="busRouteSelect">Select Route:</label>
+                         <select id="busRouteSelect" required>
+                             <option value="">-- Select a Route --</option>
+                             {# Options will be populated by JavaScript #}
+                         </select>
+                     </div>
+                      <div>
+                         <label for="busVehicleNumber">Vehicle Number:</label>
+                         <input type="text" id="busVehicleNumber" required placeholder="e.g., KL 01 AB 1234">
+                     </div>
+
+                     {# Container for dynamically generated schedule inputs #}
+                     <div id="scheduleInputsContainer" class="schedule-input-container" style="display: none;">
+                         <h4>Enter Schedule Timings:</h4>
+                         {# Schedule inputs will be added here by JavaScript #}
+                     </div>
+
+                     <button type="submit">Add Bus Trip</button>
+                 </form>
+                 <div id="addBusStatus" class="status-message"></div>
+            </div>
+
+
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        &copy; 2025 Flick Bus. All rights reserved. Admin access.
+    </footer>
+
+    <script>
+        const addRouteForm = document.getElementById('addRouteForm');
+        const routeKeyInput = document.getElementById('routeKey');
+        const routeStopsInput = document.getElementById('routeStops');
+        const busPrefixInput = document.getElementById('busPrefix');
+        const addRouteStatusDiv = document.getElementById('addRouteStatus');
+
+        const manageRoutesSection = document.getElementById('manageRoutesSection');
+        const routeListUl = document.getElementById('routeList');
+        const manageRoutesStatusDiv = document.getElementById('manageRoutesStatus');
+
+
+        const addBusForm = document.getElementById('addBusForm');
+        const busRouteSelect = document.getElementById('busRouteSelect');
+        const busVehicleNumberInput = document.getElementById('busVehicleNumber');
+        const scheduleInputsContainer = document.getElementById('scheduleInputsContainer');
+        const addBusStatusDiv = document.getElementById('addBusStatus');
+
+        // Store fetched route data globally accessible to the script
+        let fetchedRoutesData = {};
+
+
+        // Function to fetch routes from the backend and populate the dropdown and list
+        async function fetchAndDisplayRoutes() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get_routes');
+                if (!response.ok) {
+                    // Check for specific status codes or just treat non-ok as an error
+                    const errorText = await response.text(); // Get response body for more info
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+                }
+                fetchedRoutesData = await response.json(); // Store fetched data
+
+                // --- Populate Route Dropdown (for Add Bus Trip) ---
+                busRouteSelect.innerHTML = '<option value="">-- Select a Route --</option>';
+                for (const routeKey in fetchedRoutesData) {
+                    const option = document.createElement('option');
+                    option.value = routeKey;
+                    option.textContent = routeKey.replace('-', ' to ').replace(/\b\w/g, l => l.toUpperCase()); // Format route name
+                    busRouteSelect.appendChild(option);
+                }
+
+                // --- Populate Route List (for Manage Routes) ---
+                routeListUl.innerHTML = ''; // Clear existing list items
+                if (Object.keys(fetchedRoutesData).length === 0) {
+                     routeListUl.innerHTML = '<li class="text-cccccc italic">No routes added yet.</li>';
+                } else {
+                     for (const routeKey in fetchedRoutesData) {
+                         const routeDetails = fetchedRoutesData[routeKey];
+                         const routeItem = document.createElement('li');
+                         routeItem.classList.add('route-item');
+                         routeItem.innerHTML = `
+                             <div class="route-item-info">
+                                 <strong>${routeKey.replace('-', ' to ').replace(/\b\w/g, l => l.toUpperCase())}</strong> (${routeKey})<br>
+                                 <span>Stops: ${routeDetails.stops.join(', ')}</span><br>
+                                 <span>Bus Prefix: ${routeDetails.bus_prefix || 'N/A'}</span>
+                             </div>
+                             <div class="route-item-actions">
+                                 <button class="edit-button" data-route-key="${routeKey}">Edit</button>
+                                 <button class="remove-button" data-route-key="${routeKey}">Remove</button>
+                             </div>
+                         `;
+                         routeListUl.appendChild(routeItem);
+                     }
+                }
+
+
+            } catch (error) {
+                console.error('Error fetching routes:', error);
+                // Display error messages - provide a more helpful message
+                 const errorMessage = `Error loading routes: ${error.message || 'Could not connect to the server.'} Please ensure the backend server is running at http://127.0.0.1:5000.`;
+                 addBusStatusDiv.textContent = errorMessage;
+                 addBusStatusDiv.className = 'status-message status-error';
+                 manageRoutesStatusDiv.textContent = errorMessage;
+                 manageRoutesStatusDiv.className = 'status-message status-error';
+            }
+        }
+
+        // Initial fetch and display of routes when the page loads
+        fetchAndDisplayRoutes();
+
+
+        addRouteForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const routeKey = routeKeyInput.value.trim();
+            const routeStops = routeStopsInput.value.split(',').map(stop => stop.trim()).filter(stop => stop !== ''); // Split by comma, trim whitespace, remove empty stops
+            const busPrefix = busPrefixInput.value.trim();
+
+            if (!routeKey || routeStops.length < 2 || !busPrefix) {
+                displayStatus("Please fill in all fields and provide at least two stops.", "error", addRouteStatusDiv);
+                return;
+            }
+
+            const routeData = {
+                route_key: routeKey,
+                stops: routeStops,
+                bus_prefix: busPrefix
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/admin/add_route', { // Send data to the Flask endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(routeData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    displayStatus(result.message, "success", addRouteStatusDiv);
+                    // Optionally clear the form
+                    addRouteForm.reset();
+                    // Refresh the route dropdown and list
+                    fetchAndDisplayRoutes();
+                } else {
+                    displayStatus(`Error: ${result.message}`, "error", addRouteStatusDiv);
+                }
+
+            } catch (error) {
+                console.error('Error adding route:', error);
+                displayStatus("An error occurred while adding the route. Check console for details.", "error", addRouteStatusDiv);
+            }
+        });
+
+
+        // --- Event Listener for Route Selection in Add Bus Form ---
+        busRouteSelect.addEventListener('change', (event) => {
+            const selectedRouteKey = event.target.value;
+            scheduleInputsContainer.innerHTML = '<h4>Enter Schedule Timings:</h4>'; // Clear previous inputs
+
+            if (selectedRouteKey && fetchedRoutesData[selectedRouteKey]) {
+                const stops = fetchedRoutesData[selectedRouteKey].stops;
+                scheduleInputsContainer.style.display = 'block'; // Show the container
+
+                stops.forEach((stop, index) => {
+                    const stopInputDiv = document.createElement('div');
+                    stopInputDiv.classList.add('stop-timing-inputs');
+
+                    // Input for Arrival Time (for all stops except the first)
+                    let arrivalInputHtml = '';
+                    if (index > 0) {
+                        arrivalInputHtml = `
+                            <div>
+                                <label for="arrival-${index}">${stop} Arrival:</label>
+                                <input type="time" id="arrival-${index}" data-stop-index="${index}" data-time-type="arrival" required>
+                            </div>
+                        `;
+                    }
+
+                    // Input for Departure Time (for all stops except the last)
+                    let departureInputHtml = '';
+                    if (index < stops.length - 1) {
+                        departureInputHtml = `
+                            <div>
+                                <label for="departure-${index}">${stop} Departure:</label>
+                                <input type="time" id="departure-${index}" data-stop-index="${index}" data-time-type="departure" required>
+                            </div>
+                        `;
+                    }
+
+                    // Combine inputs for the stop
+                    stopInputDiv.innerHTML = `
+                        <p class="font-semibold text-white col-span-full">${stop}</p>
+                        ${arrivalInputHtml}
+                        ${departureInputHtml}
+                    `;
+
+                    scheduleInputsContainer.appendChild(stopInputDiv);
+                });
+
+                // Add event listeners to the newly created time inputs for validation (optional but recommended)
+                // You could add logic here to ensure times are sequential.
+
+            } else {
+                scheduleInputsContainer.style.display = 'none'; // Hide the container if no route is selected
+            }
+        });
+        // --- End Event Listener for Route Selection ---
+
+
+        addBusForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const selectedRouteKey = busRouteSelect.value;
+            const vehicleNumber = busVehicleNumberInput.value.trim();
+
+            if (!selectedRouteKey || !vehicleNumber) {
+                 displayStatus("Please select a route and enter a vehicle number.", "error", addBusStatusDiv);
+                 return;
+            }
+
+            // --- Collect Schedule Data from Dynamic Inputs ---
+            const schedule = [];
+            const stops = fetchedRoutesData[selectedRouteKey].stops;
+            let isValidScheduleInput = true; // Flag for frontend validation
+
+            stops.forEach((stop, index) => {
+                const stopEntry = { "station": stop };
+
+                // Get arrival time input (if it exists)
+                const arrivalInput = scheduleInputsContainer.querySelector(`#arrival-${index}`);
+                if (arrivalInput) {
+                    stopEntry.arrivalTime = formatTimeForDisplay(arrivalInput.value); // e.g., "08:05 AM"
+                    // Store ISO format for backend validation and storage
+                     stopEntry.arrivalDateTime = createIsoDateTime(arrivalInput.value);
+                     if (!stopEntry.arrivalDateTime) {
+                         isValidScheduleInput = false;
+                         displayStatus(`Invalid arrival time for ${stop}.`, "error", addBusStatusDiv);
+                         return; // Stop forEach
+                     }
+                }
+
+                // Get departure time input (if it exists)
+                const departureInput = scheduleInputsContainer.querySelector(`#departure-${index}`);
+                 if (departureInput) {
+                    stopEntry.departureTime = formatTimeForDisplay(departureInput.value); // e.g., "08:06 AM"
+                    // Store ISO format for backend validation and storage
+                     stopEntry.departureDateTime = createIsoDateTime(departureInput.value);
+                     if (!stopEntry.departureDateTime) {
+                         isValidScheduleInput = false;
+                         displayStatus(`Invalid departure time for ${stop}.`, "error", addBusStatusDiv);
+                         return; // Stop forEach
+                     }
+                 }
+
+                 // Basic frontend time order validation (optional but helpful)
+                 if (stopEntry.arrivalDateTime && stopEntry.departureDateTime && new Date(stopEntry.departureDateTime) < new Date(stopEntry.arrivalDateTime)) {
+                      isValidScheduleInput = false;
+                      displayStatus(`Departure time at ${stop} cannot be before arrival time.`, "error", addBusStatusDiv);
+                      return; // Stop forEach
+                 }
+                 if (index > 0) {
+                     const previousStopEntry = schedule[index - 1];
+                     const previousDepartureTime = previousStopEntry.departureDateTime || previousStopEntry.arrivalDateTime; // Use departure if exists, else arrival
+                      if (previousDepartureTime && stopEntry.arrivalDateTime && new Date(stopEntry.arrivalDateTime) < new Date(previousDepartureTime)) {
+                           isValidScheduleInput = false;
+                           displayStatus(`Arrival time at ${stop} cannot be before the departure/arrival time of the previous stop (${previousStopEntry.station}).`, "error", addBusStatusDiv);
+                           return; // Stop forEach
+                      }
+                 }
+
+
+                schedule.push(stopEntry);
+            });
+
+            if (!isValidScheduleInput) {
+                 return; // Stop submission if frontend validation failed
+            }
+
+            // Ensure the schedule has at least two entries (start and end)
+            if (schedule.length < 2) {
+                 displayStatus("Schedule must contain at least two stops with timings.", "error", addBusStatusDiv);
+                 return;
+            }
+
+            const busData = {
+                route_key: selectedRouteKey,
+                vehicle_number: vehicleNumber,
+                schedule: schedule // Send the collected schedule
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/admin/add_bus', { // Endpoint for adding buses
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(busData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    displayStatus(result.message, "success", addBusStatusDiv);
+                    // Optionally clear the form and hide schedule inputs
+                    addBusForm.reset();
+                    scheduleInputsContainer.style.display = 'none';
+                    scheduleInputsContainer.innerHTML = '<h4>Enter Schedule Timings:</h4>'; // Reset content
+                     // Refresh the route dropdown and list (in case adding a bus triggers a data change that affects routes, though unlikely with this structure)
+                    fetchAndDisplayRoutes();
+
+                } else {
+                    displayStatus(`Error: ${result.message}`, "error", addBusStatusDiv);
+                }
+
+            } catch (error) {
+                console.error('Error adding bus trip:', error);
+                displayStatus("An error occurred while adding the bus trip. Check console for details.", "error", addBusStatusDiv);
+            }
+        });
+
+        // Helper function to format time for display (HH:MM AM/PM)
+        function formatTimeForDisplay(time24) {
+            if (!time24) return '';
+            const [hour, minute] = time24.split(':').map(Number);
+            const date = new Date(); // Use a dummy date
+            date.setHours(hour, minute, 0, 0);
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+         // Helper function to create ISO datetime string from time input (using today's date)
+         function createIsoDateTime(time24) {
+             if (!time24) return null;
+             const [hour, minute] = time24.split(':').map(Number);
+             const date = new Date(); // Use today's date
+             date.setHours(hour, minute, 0, 0);
+             // Return ISO string, ensuring consistent format for backend
+             return date.toISOString(); // ISO 8601 format
+         }
+
+
+        // --- Event Delegation for Edit and Remove Buttons ---
+        routeListUl.addEventListener('click', async (event) => {
+            const target = event.target;
+
+            // Handle Edit Button Click
+            if (target.classList.contains('edit-button')) {
+                const routeKeyToEdit = target.dataset.routeKey;
+                console.log(`Edit button clicked for route: ${routeKeyToEdit}`);
+                // TODO: Implement logic to fetch the specific route data
+                // and populate a dedicated edit form or the Add Route form for editing.
+
+                 // Example: Populate the Add Route form for editing (requires fetching route details)
+                 // You would need an endpoint like /get_route/<route_key>
+                 // For now, we can use the fetchedRoutesData we already have
+                 const routeDetails = fetchedRoutesData[routeKeyToEdit];
+                 if (routeDetails) {
+                     routeKeyInput.value = routeKeyToEdit;
+                     routeStopsInput.value = routeDetails.stops.join(', ');
+                     busPrefixInput.value = routeDetails.bus_prefix;
+
+                     // You might change the form title and button text for clarity
+                     document.querySelector('#addRouteSection h2').textContent = 'Edit Route';
+                     addRouteForm.querySelector('button[type="submit"]').textContent = 'Update Route';
+                     // Store the original route key if needed for the update request
+                     addRouteForm.dataset.editingRouteKey = routeKeyToEdit;
+
+                      // You might also disable the routeKeyInput if editing is not allowed
+                      // routeKeyInput.disabled = true;
+
+                 } else {
+                     displayStatus("Error: Could not find route details for editing.", "error", manageRoutesStatusDiv);
+                 }
+
+
+            }
+
+            // Handle Remove Button Click
+            if (target.classList.contains('remove-button')) {
+                const routeKeyToRemove = target.dataset.routeKey;
+                if (confirm(`Are you sure you want to remove the route: ${routeKeyToRemove.replace('-', ' to ').replace(/\b\w/g, l => l.toUpperCase())}? This will also remove all associated bus trips.`)) {
+                    try {
+                        const response = await fetch(`http://127.0.0.1:5000/admin/delete_route/${routeKeyToRemove}`, {
+                            method: 'DELETE'
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            displayStatus(result.message, "success", manageRoutesStatusDiv);
+                            // Refresh the route list and dropdown after removal
+                            fetchAndDisplayRoutes();
+                        } else {
+                            displayStatus(`Error: ${result.message}`, "error", manageRoutesStatusDiv);
+                        }
+
+                    } catch (error) {
+                        console.error('Error removing route:', error);
+                        displayStatus("An error occurred while removing the route. Check console for details.", "error", manageRoutesStatusDiv);
+                    }
+                }
+            }
+        });
+        // --- End Event Delegation ---
+
+
+        function displayStatus(message, type, element) {
+            element.textContent = message;
+            element.className = 'status-message ' + (type === 'success' ? 'status-success' : 'status-error');
+        }
+    </script>
+</body>
+</html>

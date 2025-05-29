@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flick Bus - Next Bus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif; /* Using Montserrat font */
+            background-color: #1a1a1a; /* Dark background */
+            color: #ffffff; /* White text color */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0; /* Remove default body margin */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Optional: Add a subtle background gradient or pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(30, 58, 138, 0.2), transparent 50%),
+                        radial-gradient(circle at bottom right, rgba(4, 116, 144, 0.2), transparent 50%); /* Subtle blue/teal gradients */
+            z-index: -1;
+        }
+
+        /* Header/Navigation Styling - Transparent */
+        .site-header {
+            background-color: transparent; /* Make background transparent */
+            padding: 1.5rem 0; /* More padding */
+            position: absolute; /* Position over the content */
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 20; /* Ensure it's above other content */
+        }
+
+        .site-header .container {
+             display: flex;
+             justify-content: space-between; /* Space out logo and nav */
+             align-items: center; /* Vertically align */
+             max-width: 1200px; /* Wider container */
+             margin: 0 auto; /* Center the container */
+             padding: 0 2.5rem; /* More padding on sides */
+        }
+
+        .site-title a {
+            color: #ffffff; /* White color for title link */
+            text-decoration: none;
+            font-size: 2rem; /* Larger font size for title */
+            font-weight: 700; /* Bolder weight */
+            transition: opacity 0.3s ease-in-out;
+        }
+         .site-title a:hover {
+             opacity: 0.8; /* Subtle hover effect */
+         }
+
+        .site-nav a {
+            color: #cccccc; /* Light gray for nav links */
+            margin-left: 3rem; /* More spacing between nav links */
+            text-decoration: none;
+            font-weight: 400; /* Regular weight */
+            font-size: 1.05rem; /* Slightly larger font */
+            transition: color 0.2s ease-in-out;
+        }
+        .site-nav a:hover {
+            color: #ffffff; /* White on hover */
+        }
+
+        /* Main Content Section */
+        .main-content {
+            flex-grow: 1; /* Allow main content to grow */
+            width: 100%;
+            max-width: 1000px; /* Match header width */
+            margin: 8rem auto 2rem; /* Add top margin to clear header, center, add bottom margin */
+            padding: 0 2rem; /* Add padding */
+            position: relative; /* Needed for z-index */
+            z-index: 10; /* Ensure content is above background effects */
+        }
+
+        /* Section Styling - Removed background box */
+        .main-content section {
+            padding: 0; /* Removed padding from the section itself */
+        }
+         .main-content section h1,
+         .main-content section h2 {
+             font-size: 2.5rem; /* Larger section titles */
+             font-weight: 700;
+             color: #ffffff; /* White titles */
+             margin-bottom: 1.5rem;
+             text-align: center; /* Center titles */
+         }
+          .main-content section p {
+              font-size: 1.125rem; /* Slightly larger body text */
+              color: #cccccc; /* Light gray text */
+              margin-bottom: 1rem;
+          }
+
+        /* Form Styling */
+        .search-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+            gap: 1.5rem; /* Space between inputs */
+            align-items: flex-end;
+            margin-bottom: 2rem;
+        }
+        .search-form-grid label {
+             display: block;
+             font-size: 0.95rem;
+             font-weight: medium;
+             color: #cccccc; /* Light gray labels */
+             margin-bottom: 0.5rem;
+        }
+         .search-form-grid select,
+         .search-form-grid input[type="date"],
+         .search-form-grid input[type="time"] {
+             width: 100%;
+             padding: 0.75rem 1rem;
+             border: 1px solid #555; /* Darker gray border */
+             border-radius: 0.375rem;
+             font-size: 1rem;
+             color: #ffffff; /* White text */
+             background-color: #3a3a3a; /* Slightly lighter dark background for inputs */
+             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+         }
+          .search-form-grid select:focus,
+          .search-form-grid input[type="date"]:focus,
+          .search-form-grid input[type="time"]:focus {
+             outline: none;
+             border-color: #0f766e; /* Teal focus color */
+             box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.3); /* Focus ring */
+          }
+        .search-button-container {
+            grid-column: span 1 / span 1;
+            text-align: center;
+        }
+         @media (min-width: 768px) {
+              .search-button-container {
+                 grid-column: span 3 / span 3; /* Button spans all 3 columns on medium screens+ */
+                 text-align: center; /* Center the button */
+              }
+         }
+        .search-form-grid button {
+             width: 100%;
+             padding: 0.75rem 1.5rem;
+             font-size: 1.125rem;
+             font-weight: 600;
+             border-radius: 0.5rem;
+             background-color: #ef4444; /* Red button */
+             color: white;
+             transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        }
+         .search-form-grid button:hover:not(:disabled) {
+             background-color: #dc2626; /* Darker red on hover */
+         }
+         .search-form-grid button:disabled {
+             opacity: 0.5;
+             cursor: not-allowed;
+         }
+
+        /* Geolocation Button Styling */
+        .geolocation-button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            background-color: #0f766e; /* Teal button */
+            color: white;
+            margin-top: 1rem; /* Space above */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .geolocation-button:hover {
+            background-color: #0b5f57; /* Darker teal on hover */
+        }
+        .geolocation-status {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #cccccc;
+        }
+
+
+        /* Bus Results Styling */
+        .bus-result {
+            border-bottom: 1px solid #3a3a3a; /* Darker separator line */
+            padding-bottom: 1.5rem; /* More padding */
+            margin-bottom: 1.5rem; /* More margin */
+        }
+        .bus-result:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .bus-result h3 {
+            font-size: 1.25rem; /* Larger bus number */
+            font-weight: 600;
+            color: #ffffff; /* White bus number */
+            margin-bottom: 0.5rem;
+        }
+         .bus-result p {
+             font-size: 1rem;
+             color: #cccccc; /* Light gray text */
+             margin-bottom: 0.5rem;
+         }
+        .bus-result ul {
+            list-style: disc;
+            list-style-position: inside;
+            color: #cccccc; /* Light gray list items */
+            margin-left: 1rem;
+        }
+         .bus-result ul li {
+             margin-bottom: 0.25rem;
+         }
+         .bus-result .next-bus-highlight {
+             background-color: rgba(15, 118, 110, 0.3); /* Slightly transparent teal background */
+             padding: 1rem;
+             border-radius: 0.5rem;
+             margin-bottom: 1rem; /* Space below highlight */
+             border: 1px solid #0f766e; /* Teal border */
+         }
+         .next-bus-highlight h3,
+         .next-bus-highlight p,
+         .next-bus-highlight ul li {
+             color: #ffffff; /* White text inside highlight */
+         }
+
+
+        /* Footer Styling - Very subtle */
+        .site-footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            color: #777; /* Darker gray */
+            font-size: 0.8rem; /* Smaller font size */
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent dark background */
+        }
+    </style>
+</head>
+<body class="p-0">
+
+    <header class="site-header">
+        <div class="container">
+            <div class="site-title">
+                {# Link to the index route #}
+                <a href="{{ url_for('index') }}">Flick Bus</a>
+            </div>
+            <nav class="site-nav">
+                {# Link to the about route #}
+                <a href="{{ url_for('about') }}">About</a>
+                {# Link to the next_bus route #}
+                <a href="{{ url_for('next_bus') }}">Next Bus</a>
+                {# Link to the find_bus route #}
+                <a href="{{ url_for('find_bus') }}">Find Bus</a>
+                {# Link to the explore route #}
+                <a href="{{ url_for('explore') }}">Explore</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section>
+            <h1>Flick Bus - Next Bus</h1>
+            <p class="text-center mb-6">Find the next upcoming buses from your current stop.</p>
+
+            <div class="search-form-grid">
+                <div>
+                    <label for="busRoute">Select Route:</label>
+                    <select id="busRoute">
+                        <option value="">Select Bus Route</option>
+                        </select>
+                </div>
+                <div>
+                    <label for="fromLocation">From:</label>
+                    <select id="fromLocation" disabled>
+                        <option value="">Select Departure</option>
+                        </select>
+                </div>
+                <div>
+                    <label for="toLocation">To:</label>
+                     <select id="toLocation" disabled>
+                        <option value="">Select Destination</option>
+                        </select>
+                </div>
+                 <div class="search-button-container">
+                     <button id="searchButton" disabled>Find Next Buses</button>
+                 </div>
+            </div>
+
+            {# Geolocation Section #}
+            <div class="text-center mt-4">
+                <button id="detectLocationButton" class="geolocation-button">Detect My Location</button>
+                <p id="geolocationStatus" class="geolocation-status">Attempting to detect your location...</p>
+                <p id="detectedCoordinates" class="geolocation-status"></p>
+            </div>
+
+
+            <div id="resultsArea">
+                <h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>
+                <p id="noResultsMessage" class="text-cccccc italic">Select a route, locations, and click "Find Next Buses" to see upcoming buses.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        &copy; 2025 Flick Bus. All rights reserved. Proudly serving Kerala bus routes.
+    </footer>
+
+    <script>
+        // --- Data Structures for Routes and Stops (Will be fetched from backend) ---
+        let routesData = {}; // Initialize as empty, will be populated from fetch
+        // --- End Data Structures ---
+
+
+        // Get elements from the DOM
+        const busRouteSelect = document.getElementById('busRoute');
+        const fromSelect = document.getElementById('fromLocation');
+        const toSelect = document.getElementById('toLocation');
+        const searchButton = document.getElementById('searchButton');
+        const resultsArea = document.getElementById('resultsArea');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+
+        // Geolocation elements
+        const detectLocationButton = document.getElementById('detectLocationButton');
+        const geolocationStatus = document.getElementById('geolocationStatus');
+        const detectedCoordinates = document.getElementById('detectedCoordinates');
+
+
+        // Function to fetch routes from the backend and populate the dropdown
+        async function populateRouteDropdown() {
+            try {
+                // Use absolute URL for fetching routes
+                const response = await fetch('http://127.0.0.1:5000/get_routes');
+                if (!response.ok) {
+                     const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+                }
+                routesData = await response.json(); // Populate routesData with fetched data
+
+                // Clear existing options (except the default)
+                busRouteSelect.innerHTML = '<option value="">Select Bus Route</option>';
+
+                for (const routeKey in routesData) {
+                    const option = document.createElement('option');
+                    option.value = routeKey;
+                    // Format route name with hyphen
+                    option.textContent = routeKey.replace('-', ' - ').replace(/\b\w/g, l => l.toUpperCase());
+                    busRouteSelect.appendChild(option);
+                }
+
+            } catch (error) {
+                console.error('Error fetching routes:', error);
+                // Display an error message if routes cannot be loaded
+                 const errorMessage = `Error loading routes: ${error.message || 'Could not connect to the server.'} Please ensure the backend server is running at http://127.0.0.1:5000.`;
+                 resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+                 resultsArea.innerHTML += `<p class="text-red-500 italic">${errorMessage}</p>`;
+                 busRouteSelect.innerHTML = '<option value="">Error loading routes</option>';
+                 busRouteSelect.disabled = true; // Disable dropdown on error
+                 searchButton.disabled = true; // Disable search button
+                 fromSelect.disabled = true; // Disable stop dropdowns
+                 toSelect.disabled = true;
+                 if (noResultsMessage) {
+                      noResultsMessage.style.display = 'none'; // Hide initial message
+                 }
+            }
+        }
+
+        // Populate From and To dropdowns based on selected route
+        function populateStopDropdowns(routeKey) {
+            // Clear existing options (except the default)
+            fromSelect.innerHTML = '<option value="">Select Departure</option>';
+            toSelect.innerHTML = '<option value="">Select Destination</option>';
+
+            if (routeKey && routesData[routeKey] && routesData[routeKey].stops) { // Check if stops exist
+                const stops = routesData[routeKey].stops;
+                stops.forEach(stop => {
+                    const fromOption = document.createElement('option');
+                    fromOption.value = stop.toLowerCase();
+                    fromOption.textContent = stop;
+                    fromSelect.appendChild(fromOption);
+
+                    const toOption = document.createElement('option');
+                    toOption.value = stop.toLowerCase();
+                    toOption.textContent = stop;
+                    toSelect.appendChild(toOption);
+                });
+                // Enable stop dropdowns
+                fromSelect.disabled = false;
+                toSelect.disabled = false;
+            } else {
+                 // Disable stop dropdowns and search button if no route is selected or stops data is missing
+                fromSelect.disabled = true;
+                toSelect.disabled = true;
+            }
+             // Always update button state when stops change
+            updateSearchButtonState();
+        }
+
+        // Function to update the search button's disabled state
+        function updateSearchButtonState() {
+             if (busRouteSelect.value && fromSelect.value && toSelect.value && fromSelect.value !== toSelect.value) {
+                 searchButton.disabled = false;
+             } else {
+                 searchButton.disabled = true;
+             }
+        }
+
+
+        // Add event listeners to the dropdowns to update button state
+        busRouteSelect.addEventListener('change', (event) => {
+            const selectedRouteKey = event.target.value;
+            populateStopDropdowns(selectedRouteKey);
+            // Clear previous search results when route changes
+            resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+             if (noResultsMessage) {
+                 noResultsMessage.style.display = 'block';
+             }
+        });
+
+        fromSelect.addEventListener('change', updateSearchButtonState);
+        toSelect.addEventListener('change', updateSearchButtonState);
+
+
+        // Call the function to populate the route dropdown on page load
+        populateRouteDropdown();
+
+
+        // Add event listener to the search button
+        searchButton.addEventListener('click', findUpcomingBuses);
+
+        // Function to find upcoming buses by calling the backend API
+        async function findUpcomingBuses() {
+            const selectedRouteKey = busRouteSelect.value;
+            const from = fromSelect.value; // Get value from select
+            const to = toSelect.value;     // Get value from select
+
+            // Clear previous results and show loading indicator (optional)
+            resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+            resultsArea.innerHTML += '<p class="text-cccccc italic">Searching for buses...</p>';
+             if (noResultsMessage) {
+                 noResultsMessage.style.display = 'none'; // Hide initial message
+             }
+
+
+            if (from === '' || to === '') {
+                resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+                resultsArea.innerHTML += '<p class="text-red-500 italic">Please select both departure and destination locations.</p>';
+                 if (noResultsMessage) {
+                     noResultsMessage.style.display = 'block';
+                 }
+                return;
+            }
+
+             if (from === to) {
+                 resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+                resultsArea.innerHTML += '<p class="text-red-500 italic">Departure and destination locations cannot be the same.</p>';
+                 if (noResultsMessage) {
+                     noResultsMessage.style.display = 'block';
+                 }
+                return;
+            }
+
+            // --- Call the Backend API ---
+            // Construct the URL for the backend search endpoint
+            // Note: The /search endpoint in app.py is designed to handle both 'Next Bus' (current time)
+            // and 'Find Bus' (specific date/time) based on the parameters provided.
+            // For 'Next Bus', we don't provide date/time, so it defaults to current time.
+            // Use the absolute path relative to the server root
+            const backendUrl = `/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&route=${encodeURIComponent(selectedRouteKey)}`;
+
+            try {
+                const response = await fetch(backendUrl); // Make the GET request
+
+                if (!response.ok) {
+                    // Handle HTTP errors (e.g., 404 Not Found, 500 Internal Server Error)
+                    console.error(`HTTP error! status: ${response.status}`);
+                     resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+                    resultsArea.innerHTML += '<p class="text-red-500 italic">Error fetching bus data. Please try again later.</p>';
+                     if (noResultsMessage) {
+                         noResultsMessage.style.display = 'block';
+                     }
+                    return;
+                }
+
+                const upcomingBuses = await response.json(); // Parse the JSON response
+
+                // --- Display Results ---
+                 resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>'; // Clear loading message
+
+                if (upcomingBuses.length > 0) {
+                    upcomingBuses.forEach((bus, index) => {
+                        const busElement = document.createElement('div');
+                        // Use a class for the highlight effect
+                        busElement.classList.add('bus-result');
+
+                        // Format the route name with a hyphen
+                        const formattedRouteName = bus.route.replace(' to ', ' - ');
+
+                        busElement.innerHTML = `
+                            <h3 class="text-lg font-medium">${formattedRouteName} - ${bus.vehicle_number}</h3>
+                            <p class="text-sm mb-2">From ${bus.from_station} to ${bus.to_station}:</p>
+                            <ul class="text-sm">
+                                {# Display only departure for the 'from' station #}
+                                <li>${bus.from_station}: Departure: ${bus.departure_time}</li>
+                                {# Display only arrival for the 'to' station #}
+                                <li>${bus.to_station}: Arrival: ${bus.arrival_time}</li>
+                            </ul>
+                             {# This line is redundant as the departure time is already in the list above, keeping for now #}
+                             {# <p class="text-sm font-semibold text-green-400 mt-2">Departs from ${bus.from_station} at: ${bus.departure_time}</p> #}
+                        `;
+
+                         // Add the highlight class to the very next bus result element
+                         if (index === 0) {
+                             busElement.classList.add('next-bus-highlight');
+                         }
+
+
+                        resultsArea.appendChild(busElement);
+                    });
+
+                     // Hide the initial "no results" message
+                     if (noResultsMessage) {
+                         noResultsMessage.style.display = 'none';
+                     }
+                } else {
+                    resultsArea.innerHTML += '<p id="noResultsMessage" class="text-cccccc italic">No upcoming buses found for this route segment.</p>';
+                     // Show the initial "no results" message if no buses are found
+                     if (noResultsMessage) {
+                         noResultsMessage.style.display = 'block';
+                     }
+                }
+
+            } catch (error) {
+                // Handle network errors (e.g., backend server is not running)
+                console.error('Error fetching bus data:', error);
+                 resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Upcoming Buses:</h2>';
+                resultsArea.innerHTML += '<p class="text-red-500 italic">Could not connect to the bus data server. Please ensure the backend is running.</p>';
+                 if (noResultsMessage) {
+                     noResultsMessage.style.display = 'block';
+                 }
+            }
+            // --- End Call the Backend API ---
+        }
+
+        // Initial state: show the no results message
+        if (noResultsMessage) {
+             noResultsMessage.style.display = 'block';
+        }
+
+        // Initial call to update button state on page load (in case dropdowns have default values)
+        updateSearchButtonState();
+
+
+        // --- Geolocation Logic ---
+        // Function to initiate geolocation detection
+        function initiateGeolocation() {
+            if (navigator.geolocation) {
+                geolocationStatus.textContent = 'Detecting your location...';
+                detectedCoordinates.textContent = ''; // Clear previous coordinates
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                geolocationStatus.textContent = 'Geolocation is not supported by this browser.';
+                detectedCoordinates.textContent = '';
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            geolocationStatus.textContent = 'Location detected!';
+            detectedCoordinates.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}`;
+            geolocationStatus.textContent += ' Please select your nearest stop from the "From" dropdown.';
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    geolocationStatus.textContent = "User denied the request for Geolocation. Click 'Detect My Location' to try again.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    geolocationStatus.textContent = "Location information is unavailable. Click 'Detect My Location' to try again.";
+                    break;
+                case error.TIMEOUT:
+                    geolocationStatus.textContent = "The request to get user location timed out. Click 'Detect My Location' to try again.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    geolocationStatus.textContent = "An unknown error occurred. Click 'Detect My Location' to try again.";
+                    break;
+            }
+            detectedCoordinates.textContent = '';
+        }
+
+        // Trigger geolocation detection when the page content is fully loaded
+        document.addEventListener('DOMContentLoaded', initiateGeolocation);
+
+        // Add event listener to the button for manual re-detection
+        detectLocationButton.addEventListener('click', initiateGeolocation);
+        // --- End Geolocation Logic ---
+
+    </script>
+</body>
+</html>
