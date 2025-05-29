@@ -1,368 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flick Bus - Find Bus</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            /* Using Montserrat font */
-            background-color: #1a1a1a;
-            /* Dark background */
-            color: #ffffff;
-            /* White text color */
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            /* Full viewport height */
-            margin: 0;
-            /* Remove default body margin */
-            overflow-x: hidden;
-            /* Prevent horizontal scroll */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flick Bus - Find Bus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #1a1a1a;
+      color: #ffffff;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+    }
 
-        /* Optional: Add a subtle background gradient or pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at top left, rgba(30, 58, 138, 0.2), transparent 50%),
-                radial-gradient(circle at bottom right, rgba(4, 116, 144, 0.2), transparent 50%)
-        }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at top left, rgba(30, 58, 138, 0.2), transparent 50%),
+                  radial-gradient(circle at bottom right, rgba(4, 116, 144, 0.2), transparent 50%);
+      z-index: -1;
+    }
 
-        .site-header {
-            background-color: #2a2a2a;
-            /* Darker header background */
-            padding: 1rem 0;
-        }
+    .site-header {
+      background-color: transparent;
+      padding: 1.5rem 0;
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 20;
+    }
 
-        .site-header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .site-header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
 
-        .site-header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            /* Slightly smaller header font */
-        }
+    .site-title a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: 700;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .site-title a:hover {
+      opacity: 0.8;
+    }
 
-        .site-nav a {
-            color: #ffffff;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            display: inline-block;
-            transition: color 0.3s ease;
-        }
+    .site-nav a {
+      color: #cccccc;
+      margin-left: 3rem;
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 1.05rem;
+      transition: color 0.2s ease-in-out;
+    }
+    .site-nav a:hover {
+      color: #ffffff;
+    }
 
-        .site-nav a:hover {
-            color: #cccccc;
-        }
+    .main-content {
+      flex-grow: 1;
+      width: 100%;
+      max-width: 1000px;
+      margin: 8rem auto 2rem;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 10;
+    }
 
-        .main-content {
-            flex: 1;
-            /* Take remaining vertical space */
-            padding: 2rem;
-            /* Add some padding */
-        }
+    .main-content h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
 
-        .site-footer {
-            background-color: #2a2a2a;
-            /* Darker footer background */
-            color: #cccccc;
-            text-align: center;
-            padding: 1rem 0;
-            margin-top: auto;
-            /* Push footer to bottom */
-        }
+    .main-content p {
+      font-size: 1.125rem;
+      color: #cccccc;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
 
-        .hero-section {
-            text-align: center;
-            padding: 4rem 2rem;
-            /* More padding for hero */
-        }
-
-        .hero-section h1 {
-            font-size: 2.5rem;
-            /* Larger hero title */
-            margin-bottom: 1rem;
-        }
-
-        .hero-section p {
-            font-size: 1.2rem;
-            /* Slightly larger hero text */
-            color: #cccccc;
-        }
-
-        /* Styles for the "Find Bus" page */
-        .find-bus-form {
-            background-color: #2a2a2a;
-            /* Dark form background */
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .find-bus-form label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #cccccc;
-        }
-
-        .find-bus-form input,
-        .find-bus-form select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #4a5568;
-            border-radius: 0.375rem;
-            background-color: #4a5568;
-            /* Darker input background */
-            color: #ffffff;
-            margin-bottom: 1rem;
-        }
-
-        .find-bus-form button {
-            background-color: #4c51bf;
-            /* Indigo button color */
-            color: #ffffff;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .find-bus-form button:hover {
-            background-color: #5661b3;
-            /* Lighter indigo on hover */
-        }
-
-        #resultsArea {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #2a2a2a;
-            /* Darker results background */
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        #resultsArea h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #ffffff;
-        }
-
-        #resultsArea p {
-            color: #cccccc;
-        }
-
-        .bus-timing-card {
-            background-color: #4a5568;
-            /* Darker card background */
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1rem;
-        }
-
-        .bus-timing-card p {
-            margin: 0.5rem 0;
-        }
-
-        .bus-timing-card strong {
-            color: #ffffff;
-        }
-
-        .status-message {
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            margin-top: 1rem;
-        }
-
-        .status-success {
-            background-color: #48bb78;
-            /* Green success background */
-            color: #ffffff;
-        }
-
-        .status-error {
-            background-color: #e53e3e;
-            /* Red error background */
-            color: #ffffff;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .site-header .container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .site-nav {
-                margin-top: 1rem;
-            }
-
-            .site-nav a {
-                display: block;
-                padding: 0.5rem 0;
-            }
-
-            .hero-section {
-                padding: 2rem 1rem;
-            }
-
-            .hero-section h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    .site-footer {
+      text-align: center;
+      padding: 1.5rem 0;
+      color: #777;
+      font-size: 0.8rem;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
+<body class="p-0">
+  <header class="site-header">
+    <div class="container">
+      <div class="site-title">
+        <a href="{{ url_for('index') }}">Flick Bus</a>
+      </div>
+      <nav class="site-nav">
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('next_bus') }}">Next Bus</a>
+        <a href="{{ url_for('find_bus') }}">Find Bus</a>
+        <a href="{{ url_for('explore') }}">Explore</a>
+      </nav>
+    </div>
+  </header>
 
-<body>
-    <header class="site-header">
-        <div class="container mx-auto">
-            <h1>Flick Bus</h1>
-            <nav class="site-nav">
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('about') }}">About</a>
-                <a href="{{ url_for('next_bus') }}">Next Bus</a>
-                <a href="{{ url_for('find_bus') }}">Find Bus</a>
-                <a href="{{ url_for('explore') }}">Explore</a>
-                <a href="{{ url_for('admin') }}">Admin</a>
-            </nav>
+  <main class="main-content">
+    <h1>Find Buses for Later</h1>
+    <p>Use the form below to search for future buses between two locations on a selected route.</p>
+
+    <!-- Example Form (customize as needed) -->
+    <form action="/search" method="get" class="mt-8 space-y-6">
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label for="route" class="block text-sm font-medium mb-1">Route</label>
+          <select id="route" name="route" class="w-full bg-gray-800 text-white border border-gray-600 rounded p-2">
+            <option value="">Select a route</option>
+            <!-- Routes will be populated dynamically or statically -->
+          </select>
         </div>
-    </header>
+        <div>
+          <label for="from" class="block text-sm font-medium mb-1">From</label>
+          <input type="text" name="from" id="from" class="w-full bg-gray-800 text-white border border-gray-600 rounded p-2" />
+        </div>
+        <div>
+          <label for="to" class="block text-sm font-medium mb-1">To</label>
+          <input type="text" name="to" id="to" class="w-full bg-gray-800 text-white border border-gray-600 rounded p-2" />
+        </div>
+      </div>
 
-    <main class="main-content">
-        <section class="find-bus-section">
-            <h2 class="text-2xl font-semibold mb-4">Find Bus Timings</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label for="date" class="block text-sm font-medium mb-1">Date</label>
+          <input type="date" name="date" id="date" class="w-full bg-gray-800 text-white border border-gray-600 rounded p-2" />
+        </div>
+        <div>
+          <label for="time" class="block text-sm font-medium mb-1">Time</label>
+          <input type="time" name="time" id="time" class="w-full bg-gray-800 text-white border border-gray-600 rounded p-2" />
+        </div>
+      </div>
 
-            <form id="findBusForm" class="find-bus-form">
-                <div class="mb-4">
-                    <label for="from" class="block text-sm font-bold mb-2">From:</label>
-                    <select id="from" name="from" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="" disabled selected>Select starting station</option>
-                        <option value="Edappal">Edappal</option>
-                        <option value="Kuttippuram">Kuttippuram</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                    </select>
-                </div>
+      <button type="submit" class="mt-6 w-full md:w-auto bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded transition duration-200">
+        Find Buses
+      </button>
+    </form>
+  </main>
 
-                <div class="mb-4">
-                    <label for="to" class="block text-sm font-bold mb-2">To:</label>
-                    <select id="to" name="to" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="" disabled selected>Select destination station</option>
-                        <option value="Edappal">Edappal</option>
-                        <option value="Kuttippuram">Kuttippuram</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label for="route" class="block text-sm font-bold mb-2">Route:</label>
-                    <input type="text" id="route" name="route" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Edappal-Kuttippuram">
-                </div>
-
-                <div class="mb-4">
-                    <label for="date" class="block text-sm font-bold mb-2">Date (YYYY-MM-DD):</label>
-                    <input type="date" id="date" name="date" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-
-                <div class="mb-4">
-                    <label for="time" class="block text-sm font-bold mb-2">Time (HH:MM):</label>
-                    <input type="time" id="time" name="time" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-
-                <button id="findBusesButton" type="button" onclick="fetchBusTimings()" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Find Buses
-                </button>
-            </form>
-
-            <div id="resultsArea" class="mt-6">
-                <h2 class="text-xl font-semibold mb-4">Bus Timings:</h2>
-                <p id="noResultsMessage" class="italic">Enter search criteria to find bus timings.</p>
-            </div>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        &copy; 2025 Flick Bus. All rights reserved.
-    </footer>
-
-    <script>
-        async function fetchBusTimings() {
-            const fromLocation = document.getElementById('from').value;
-            const toLocation = document.getElementById('to').value;
-            const route = document.getElementById('route').value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-
-            // --- Call the Backend API ---
-            try {
-                const response = await fetch(`https://flick-bus-backend.onrender.com/search?from=${fromLocation}&to=${toLocation}&route=${route}&date=${date}&time=${time}`);
-                const data = await response.json();
-                const resultsArea = document.getElementById('resultsArea');
-                const noResultsMessage = document.getElementById('noResultsMessage'); // Get the no results message element
-
-                resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Bus Timings:</h2>';
-
-                if (data && data.length > 0) {
-                    data.forEach(bus => {
-                        resultsArea.innerHTML += `
-                            <div class="bus-timing-card">
-                                <p><strong>Route:</strong> ${bus.route}</p>
-                                <p><strong>Bus:</strong> ${bus.vehicle_number}</p>
-                                <p><strong>Departure:</strong> ${bus.from_station} at ${bus.departure_time}</p>
-                                <p><strong>Arrival:</strong> ${bus.to_station} at ${bus.arrival_time || 'N/A'}</p>
-                            </div>
-                        `;
-                    });
-                    // Hide the initial "no results" message if buses are found
-                    if (noResultsMessage) {
-                        noResultsMessage.style.display = 'none';
-                    }
-                } else {
-                    resultsArea.innerHTML += '<p id="noResultsMessage" class="text-cccccc italic">No bus timings found for this route segment on the selected date and time.</p>';
-                    // Show the initial "no results" message if no buses are found
-                    if (noResultsMessage) {
-                        noResultsMessage.style.display = 'block';
-                    }
-                }
-
-            } catch (error) {
-                // Handle network errors (e.g., backend server is not running)
-                console.error('Error fetching bus data:', error);
-                resultsArea.innerHTML = '<h2 class="text-xl font-semibold mb-4 text-white">Bus Timings:</h2>';
-                resultsArea.innerHTML += '<p class="text-red-500 italic">Could not connect to the bus data server. Please ensure the backend is running.</p>';
-                if (noResultsMessage) {
-                    noResultsMessage.style.display = 'block';
-                }
-            }
-            // --- End Call the Backend API ---
-        }
-
-        // Initial state: show the no results message
-        if (noResultsMessage) {
-            noResultsMessage.style.display = 'block';
-        }
-
-        // Initial call to update button state on page load (in case dropdowns have default values)
-        updateSearchButtonState();
-    </script>
+  <footer class="site-footer">
+    &copy; 2025 Flick Bus. All rights reserved. Proudly serving Kerala bus routes.
+  </footer>
 </body>
-
 </html>
